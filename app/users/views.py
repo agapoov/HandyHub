@@ -1,11 +1,12 @@
-from .forms import CustomUserRegisterForm, UserProfileForm
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.views.generic.edit import UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
+from django.views.generic.edit import UpdateView
+
+from .forms import CustomUserRegisterForm, UserProfileForm
 
 
 def login_view(request):

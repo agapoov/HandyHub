@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import User, Skill
+
+from .models import Skill, User
 
 
 @admin.register(User)
@@ -14,4 +15,7 @@ class CustomUserAdmin(admin.ModelAdmin):
     display_skills.short_description = 'Навыки'
 
 
-admin.site.register(Skill)
+@admin.register(Skill)
+class CustomSkillAdmin(admin.ModelAdmin):
+    prepopulated_fields = {"slug": ('name',)}
+    list_display = ('name',)
