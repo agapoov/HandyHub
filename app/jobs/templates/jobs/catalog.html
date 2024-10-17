@@ -46,7 +46,7 @@
     <!-- Карточка работника -->
     <div class="col-lg-4 col-md-6 p-4">
         <div class="card border-primary rounded custom-shadow">
-            <img src="{% static 'deps/icons/No-image-found.svg' %}" class="card-img-top" alt="{{ worker.username }}">
+            <img src="{{ worker.image.url }}" class="card-img-top" alt="{{ worker.username }}">
 
             <div class="card-body">
                 <h5 class="card-title">{{ worker.username }}</h5>

@@ -4,8 +4,7 @@ from django.db import models
 
 class Skill(models.Model):
     name = models.CharField(max_length=128)
-    image = models.ImageField(upload_to='media/users_images', default='static/deps/icons/No-image-found.svg')
-    icon = models.ImageField(upload_to='static/deps/skills_images', blank=True, null=True)
+    icon = models.ImageField(upload_to='static/deps/skills_images', default='static/deps/icons/No-image-found.svg', blank=True, null=True)
     slug = models.SlugField(max_length=256, unique=True, blank=True, null=True)
 
     def __str__(self):
@@ -17,7 +16,9 @@ class User(AbstractUser):
         ('worker', 'Рабочий'),
         ('employer', 'Работодатель')
     )
-    about_me = models.TextField(max_length=1024, blank=True, null=True)
+    email = models.EmailField(unique=True)
+    image = models.ImageField(upload_to='media/users_images', default='static/deps/icons/default_image.webp')
+    about_me = models.TextField(max_length=1024, blank=True, null=True, default='')
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='worker')
     surname = models.CharField(max_length=128)
     phone = models.CharField(max_length=15, blank=True, null=True)

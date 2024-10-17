@@ -1,22 +1,41 @@
 {% extends 'base.html' %}
 {% load static %}
+{% block css %}
+    <link rel="stylesheet" href={% static 'deps/css/my_css.css' %}>
+{% endblock %}
 {% block content %}
-    <div class="container mt-5">
-        <div class="row justify-content-center">
+    <div class="container-fluid mt-5">
+        <div class="row">
+            <!-- Карточка профиля слева -->
             <div class="col-md-8">
-                <div class="bg-white p-4 mb-4 mx-2 rounded custom-shadow">
+                <div class="bg-white p-4 mb-4 rounded custom-shadow">
                     <h3 class="text-center mb-4">Профиль пользователя</h3>
                     <form action="{% url 'users:profile' %}" method="post" enctype="multipart/form-data">
                         {% csrf_token %}
+                        <div class="row justify-content-center mb-3">
+                            <div class="col-auto">
+                                <div class="avatar-container">
+                                    <img src="{% if user.image %}{{ user.image.url }}{% else %}{% static 'deps/icons/default_image.webp' %}{% endif %}" alt="Аватар пользователя"
+                                         class="img-fluid rounded" id="profile-avatar">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="id_image" class="form-label">Загрузить новое фото</label>
+                                    <input type="file" class="form-control" id="id_image" name="image">
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="row">
-                            <!-- Данные пользователя -->
+                            <!-- Имя и Фамилия -->
                             <div class="col-md-6 mb-3">
                                 <label for="id_first_name" class="form-label">Имя*</label>
                                 <input type="text" class="form-control" id="id_first_name"
                                        name="first_name" placeholder="Введите ваше имя"
                                        value="{{ form.first_name.value }}" required>
                                 {% if form.first_name.errors %}
-                                    <div class="alert alert-danger alert-dismissible fade show">{{ form.first_name.errors }}</div>
+                                    <div class="alert alert-danger alert-dismissible fade show">
+                                        {{ form.first_name.errors }}
+                                    </div>
                                 {% endif %}
                             </div>
 
@@ -26,10 +45,13 @@
                                        name="last_name" placeholder="Введите вашу фамилию"
                                        value="{{ form.last_name.value }}" required>
                                 {% if form.last_name.errors %}
-                                    <div class="alert alert-danger alert-dismissible fade show">{{ form.last_name.errors }}</div>
+                                    <div class="alert alert-danger alert-dismissible fade show">
+                                        {{ form.last_name.errors }}
+                                    </div>
                                 {% endif %}
                             </div>
 
+                            <!-- Имя пользователя и Email -->
                             <div class="col-md-6 mb-3">
                                 <label for="id_username" class="form-label">Имя пользователя*</label>
                                 <input type="text" class="form-control" id="id_username"
@@ -43,93 +65,105 @@
                                        value="{{ form.email.value }}" required {% if user.email %}readonly{% endif %}>
                             </div>
 
+                            <!-- Телефон и Роль -->
                             <div class="col-md-6 mb-3">
                                 <label for="id_phone" class="form-label">Номер телефона</label>
                                 <input type="text" class="form-control" id="id_phone"
                                        name="phone" value="{{ user.phone }}" readonly>
                             </div>
-
                             <div class="col-md-6 mb-3">
                                 <label for="id_role" class="form-label">Роль</label>
                                 <div class="d-flex align-items-center">
                                     {% if user.role == 'worker' %}
-                                        <img src="{% static 'deps/icons/worker.gif' %}" alt="Worker" width="24" height="24" class="me-2">
+                                        <img src="{% static 'deps/icons/worker.gif' %}" alt="Worker"
+                                             width="24" height="24" class="me-2">
                                         <span>Рабочий</span>
                                     {% elif user.role == 'employer' %}
-                                        <img src="{% static 'deps/icons/briefcase.gif' %}" alt="Employer" width="24" height="24" class="me-2">
+                                        <img src="{% static 'deps/icons/briefcase.gif' %}" alt="Employer"
+                                             width="24" height="24" class="me-2">
                                         <span>Работодатель</span>
                                     {% else %}
                                         <span>Неизвестная роль</span>
                                     {% endif %}
                                 </div>
                             </div>
+                            <div class="col-12 mb-3">
+                                <label for="id_about_me" class="form-label">Обо мне</label>
+                                <textarea class="form-control" id="id_about_me" name="about_me"
+                                          rows="4" placeholder="Расскажите немного о себе чтобы работодатели находили вас по поиску...">{{ form.about_me.value }}</textarea>
+                                {% if form.about_me.errors %}
+                                    <div class="alert alert-danger alert-dismissible fade show mt-2">
+                                        {{ form.about_me.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Навыки -->
+                            <div class="row skills mb-3">  <!-- Используем row для сетки -->
+                                {% for skill in user.skills.all %}
+                                    <div class="col-6 d-flex align-items-center mb-2">  <!-- Каждая колонка занимает 50% -->
+                                        <img src="{{ skill.icon.url }}" alt="{{ skill.name }}" style="width: 30px; margin-right: 8px;">
+                                        <span>{{ skill.name }}</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
 
                             {% if user.role == 'worker' %}
-                            <!-- Основное действие -->
-                                <div class="row">
-                                    <div class="col-md-12 mb-3">
-                                        <label for="id_available" class="form-label">Режим "Свободен"</label>
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" id="id_available" name="available"
-                                                   {% if user.is_free %}checked{% endif %}>
-                                            <label class="form-check-label" for="id_available">Готов к работе</label>
-                                        </div>
+                                <!-- Режим "Свободен" -->
+                                <div class="col-12 mb-3">
+                                    <label for="id_available" class="form-label">Режим "Свободен"</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="id_available"
+                                               name="available" {% if user.is_free %}checked{% endif %}>
+                                        <label class="form-check-label" for="id_available">Готов к работе</label>
                                     </div>
                                 </div>
-                            {% endif %}
-                            {% if user.skills %}
-                                <div class="skills">
-                                    {% for skill in user.skills.all %}
-                                        <img src="{{ skill.icon.url }}" alt="{{ skill.name }}" style="width: 30px;">
-                                        <span>{{ skill.name }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                <p>У вас пока нет навыков :(</p>
-                            {% endif %}
-                            {% if form.errors %}
-                                <div class="alert alert-danger alert-dismissible fade show">{{ form.errors }}</div>
-                            {% endif %}
 
-{#                            <div class="col-md-12 mb-3">#}
-{#                                <label for="location" class="form-label">Местоположение</label>#}
-{#                                <div class="form-check form-switch">#}
-{#                                    <input class="form-check-input" type="checkbox" id="location_toggle" name="location">#}
-{#                                    <label class="form-check-label" for="location_toggle">Включить местоположение (ГЛОНАСС, ДСМ)</label>#}
-{#                                </div>#}
-{#                            </div>#}
-                            <div class="text-end">
-                                <button type="button" class="btn btn-info w50 " data-bs-toggle="modal" data-bs-target="#skillsModal">
-                                    Выбрать навыки
-                                </button>
-                            </div>
-                            <!-- Модальное окно -->
-                            <div class="modal fade" id="skillsModal" tabindex="-1" aria-labelledby="skillsModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="skillsModalLabel">Выберите навыки</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            {% for skill in form.skills.field.queryset %}
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="skills" value="{{ skill.id }}"
-                                                           {% if skill in user.skills.all %}checked{% endif %} id="skill_{{ skill.id }}">
-                                                    <label class="form-check-label" for="skill_{{ skill.id }}">
-                                                        <img src="{{ skill.icon.url }}" alt="{{ skill.name }}" style="width: 24px; height: 24px; margin-right: 8px;">
-                                                        {{ skill.name }}
-                                                    </label>
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                <!-- Кнопка выбора навыков -->
+                                <div class="text-end mb-3">
+                                    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#skillsModal">
+                                        Выбрать навыки
+                                    </button>
+                                </div>
+
+                                <!-- Модальное окно для навыков -->
+                                <div class="modal fade" id="skillsModal" tabindex="-1" aria-labelledby="skillsModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="skillsModalLabel">Выберите навыки</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                {% for skill in form.skills.field.queryset %}
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="skills"
+                                                               value="{{ skill.id }}"
+                                                               {% if skill in user.skills.all %}checked{% endif %}
+                                                               id="skill_{{ skill.id }}">
+                                                        <label class="form-check-label" for="skill_{{ skill.id }}">
+                                                            <img src="{{ skill.icon.url }}" alt="{{ skill.name }}"
+                                                                 style="width: 24px; height: 24px; margin-right: 8px;">
+                                                            {{ skill.name }}
+                                                        </label>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            {% endif %}
                         </div>
+
+                        {% if form.errors %}
+                            <div class="alert alert-danger alert-dismissible fade show">
+                                {{ form.errors }}
+                            </div>
+                        {% endif %}
+
                         <button type="submit" class="btn btn-dark w-25">Сохранить</button>
                     </form>
                 </div>

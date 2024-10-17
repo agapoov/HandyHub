@@ -36,3 +36,20 @@ body {
   border-radius: 15px;
   font-size: 0.7rem;
 }
+
+.avatar-container {
+    width: 150px;
+    height: 150px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#profile-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Изображение полностью заполняет блок */
+    object-position: center;
+}

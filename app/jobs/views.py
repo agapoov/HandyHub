@@ -15,9 +15,9 @@ class CatalogView(ListView):
     def get_queryset(self):
         slug_url = self.kwargs.get('slug_url', None)
         query = self.request.GET.get('q')
-        available = self.request.GET.get('available')  # Проверка на фильтр свободных работников
-        order_by = self.request.GET.get('order_by')  # Проверка на сортировку
-        print(f"GET parameters: {self.request.GET}")
+        available = self.request.GET.get('available')
+        order_by = self.request.GET.get('order_by')
+
         if slug_url == 'all':
             users = User.objects.all()
         elif query:
@@ -46,9 +46,9 @@ class CatalogView(ListView):
         try:
             users = paginator.page(page)
         except PageNotAnInteger:
-            users = paginator.page(1)  # Если страница не число
+            users = paginator.page(1)
         except EmptyPage:
-            users = paginator.page(paginator.num_pages)  # Если страница вне диапазона
+            users = paginator.page(paginator.num_pages)
 
         context['users'] = users
         context['title'] = 'HandyHub - Каталог'

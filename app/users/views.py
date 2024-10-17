@@ -54,7 +54,7 @@ class UserProfileView(LoginRequiredMixin, UpdateView):
         user = form.save(commit=False)
         user.is_free = form.cleaned_data.get('available')
         user.save()
-        user.skills.set(form.cleaned_data['skills'])  # Сохраняем выбранные навыки
+        user.skills.set(form.cleaned_data['skills'])
 
         messages.success(self.request, 'Профиль успешно обновлен')
         return super().form_valid(form)

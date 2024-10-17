@@ -17,10 +17,12 @@ class CustomUserRegisterForm(UserCreationForm):
 
 
 class UserProfileForm(UserChangeForm):
+    image = forms.ImageField(required=False)
     first_name = forms.CharField(max_length=30)
     last_name = forms.CharField(max_length=30)
     username = forms.CharField(max_length=150)
     email = forms.EmailField()
+    about_me = forms.Textarea()
     phone = forms.CharField(max_length=15, required=False)
     available = forms.BooleanField(required=False)
     skills = forms.ModelMultipleChoiceField(
@@ -30,12 +32,13 @@ class UserProfileForm(UserChangeForm):
 
     class Meta:
         model = User
-        fields = (
-            'first_name',
-            'last_name',
-            'username',
-            'email',
-            'phone',
-            'available',
-            'skills'
-        )
+        fields = ('image',
+                  'first_name',
+                  'last_name',
+                  'username',
+                  'email',
+                  'about_me',
+                  'phone',
+                  'available',
+                  'skills'
+                  )
