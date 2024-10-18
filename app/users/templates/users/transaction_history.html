@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+    <div class="my-5 pt-5 px-2 pb-2 bg-white custom-shadow rounded">
+        {% if transactions %}
+            {% for transaction in transactions %}
+                <div class="{% if transaction.transaction_type == 'cancellation' %}text-danger{% elif transaction.transaction_type == 'payment' %}text-success{% endif %}">
+                    <strong>{{ transaction.transaction_type }}</strong>: {{ transaction.amount|intcomma }} руб. - {{ transaction.created_at }}
+                    {% if transaction.description %}
+                        <p>{{ transaction.description }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Здесь будет история транзакций</p>
+        {% endif %}
+    </div>
+{% endblock %}
+

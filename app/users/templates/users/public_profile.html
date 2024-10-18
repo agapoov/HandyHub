@@ -20,7 +20,8 @@
                     </div>
                 {% if user_profile.is_free and request.user.role == 'employer' %}
                     <a href="{% url 'orders:create_order' username=user_profile.username %}"
-                   class="btn btn-success mt-3">Заказать услугу</a>
+                   class="btn btn-success mt-3">
+                        <i class="bi bi-cart-plus me-2"></i>Заказать услугу</a>
                 {% endif %}
             </div>
         </div>

@@ -1,6 +1,7 @@
+from decimal import Decimal
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from decimal import Decimal
 
 
 class Skill(models.Model):
@@ -32,6 +33,12 @@ class User(AbstractUser):
 
     def get_role_display(self):
         return dict(self.ROLE_CHOICES).get(self.role, self.role)
+
+    def has_active_orders(self):
+        from orders.models import Order
+        return Order.objects.filter(
+            worker=self
+        ).exclude(status__in=['completed', 'rejected']).exists()
 
     class Meta:
         verbose_name = 'Пользователь'

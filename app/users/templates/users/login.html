@@ -9,15 +9,22 @@
                 <h2 class="text-center mb-4">Вход в систему</h2>
                 <form action="{% url 'users:login' %}" method="post">
                     {% csrf_token %}
+
                     <div class="mb-3">
                         <label for="id_username" class="form-label">Имя пользователя</label>
-                        <input type="text" class="form-control" id="id_username" name="username" required>
+                        <input type="text" class="form-control" name="username" value="{% if form.username.value %}{{ form.username.value }}{% endif %}"
+                               id="id_username" placeholder="Введите ваше имя пользователя" required>
                     </div>
                     <div class="mb-3">
                         <label for="id_password" class="form-label">Пароль</label>
-                        <input type="password" class="form-control" id="id_password" name="password" required>
+                        <input type="password" class="form-control" name="password"
+                               id="id_password" placeholder="Введите ваш пароль" required>
                     </div>
-                    <button type="submit" class="btn btn-outline-dark">Войти</button>
+
+                    <button type="submit" class="btn btn-outline-dark">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        Войти
+                    </button>
                 </form>
                 <div class="mt-3">
                     <a href="{% url 'users:registration' %}">Нет аккаунта? Зарегистрируйтесь</a>

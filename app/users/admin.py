@@ -1,5 +1,7 @@
 from django.contrib import admin
 
+from orders.models import Transaction
+
 from .models import Skill, User
 
 
@@ -19,3 +21,6 @@ class CustomUserAdmin(admin.ModelAdmin):
 class CustomSkillAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ('name',)}
     list_display = ('name',)
+
+
+admin.site.register(Transaction)

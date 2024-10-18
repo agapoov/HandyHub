@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'deps/css/bootstrap/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'deps/css/my_css.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
     {% block css %}
     {% endblock %}
     <link rel="manifest" href="{% static 'deps/favicon/site.webmanifest' %}">
@@ -48,19 +49,28 @@
                                 Мой профиль
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item text-white" href="{% url 'users:profile' %}">Личный кабинет</a></li>
+                                <li><a class="dropdown-item text-white" href="{% url 'users:profile' %}">
+                                    <i class="bi bi-person"></i>
+                                    Личный кабинет</a></li>
                                 {% if user.is_admin or user.is_staff %}
-                                <li><a class="dropdown-item text-white" href="{% url 'admin:index' %}">Админ панель</a></li>
+                                <li><a class="dropdown-item text-white" href="{% url 'admin:index' %}">
+                                    <i class="bi bi-shield-lock"></i>
+                                    Админ панель</a></li>
                                 {% endif %}
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-white" href="{% url 'users:logout' %}">Выйти</a></li>
+                                <li><a class="dropdown-item text-white" href="{% url 'users:logout' %}">
+                                    <i class="bi bi-box-arrow-right me-2"></i>
+                                    Выйти</a></li>
                             </ul>
                         </li>
                         {% endif %}
                     </ul>
                     <form class="d-flex" role="search" action="{% url 'jobs:search' %}" method="get">
                         <input class="form-control me-2" type="search" name="q" placeholder="Найти по услугам" aria-label="Search">
-                        <button class="btn btn-outline-secondary text-white" type="submit">Поиск </button>
+                        <button class="btn btn-outline-secondary text-white d-flex align-items-center" type="submit">
+                            <i class="bi bi-search me-1"></i>
+                            Поиск
+                        </button>
                     </form>
                 </div>
             </div>
@@ -74,8 +84,7 @@
                     <button class="btn btn-secondary dropdown-toggle btn-dark" type="button" data-bs-toggle="dropdown"
                         aria-expanded="false">
                         Список услуг
-                        <img class="mx-1" src="{% static 'deps/icons/catalog_icon.png' %}" alt="Catalog Icon" width="16"
-                            height="16">
+                            <i class="bi bi-check-all me-2"></i>
                     </button>
                     <ul class="dropdown-menu bg-dark" data-bs-theme="dark">
                         {% tag_get_skills as skills %}

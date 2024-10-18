@@ -1,8 +1,9 @@
-from django.views.generic import ListView
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import Http404
+from django.views.generic import ListView
+
 from jobs.utils import q_search
 from users.models import User
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 class CatalogView(ListView):

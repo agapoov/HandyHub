@@ -2,18 +2,20 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect, render, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView
 from django.views.generic.edit import UpdateView
+
+from orders.models import Order, Transaction
+
+from .forms import CustomUserLoginForm, CustomUserRegisterForm, UserProfileForm
 from .models import User
-from .forms import CustomUserRegisterForm, UserProfileForm
-from orders.models import Order
 
 
 def login_view(request):
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
+        form = CustomUserLoginForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
@@ -83,6 +85,16 @@ class PublicUserProfileView(DetailView):
 
     def get_object(self, queryset=None):
         return get_object_or_404(User, username=self.kwargs['username'])
+
+
+class TransactionHistoryView(ListView):
+    model = Transaction
+    template_name = 'users/transaction_history.html'
+    context_object_name = 'transactions'
+
+    def get_queryset(self):
+        # Возвращаем только транзакции для текущего пользователя (работодателя)
+        return Transaction.objects.filter(user=self.request.user).order_by('-created_at')
 
 
 def logout_view(request):

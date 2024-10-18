@@ -4,6 +4,18 @@ from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from users.models import Skill, User
 
 
+class CustomUserLoginForm(forms.Form):
+    username = forms.CharField(
+        max_length=150,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Имя пользователя'}),
+        label='Имя пользователя'
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Пароль'}),
+        label='Пароль'
+    )
+
+
 class CustomUserRegisterForm(UserCreationForm):
     role = forms.ChoiceField(choices=User.ROLE_CHOICES, required=True)
     birth_date = forms.DateField(

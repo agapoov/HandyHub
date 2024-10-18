@@ -1,10 +1,12 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
-from users.models import User
-from .models import Order
-from users.models import Skill
-from django.contrib import messages
 from decimal import Decimal
+
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views import View
+
+from users.models import Skill, User
+
+from .models import Order, Transaction
 
 
 class CreateOrderView(View):
@@ -47,6 +49,13 @@ class CreateOrderView(View):
             status='pending'
         )
 
+        Transaction.objects.create(
+            user=request.user,
+            order=order,
+            amount=amount,
+            transaction_type='reserved',
+            description=f'Резервирование средств для заказа {order.id}',
+        )
         messages.success(request, 'Заказ успешно создан! Средства зарезервированы.')
         return redirect('users:profile')
 
@@ -54,6 +63,7 @@ class CreateOrderView(View):
 class OrderActionView(View):
     def post(self, request, pk, action):
         order = get_object_or_404(Order, pk=pk)
+        transaction = Transaction.objects.get(order=order)
 
         if action == 'accept':
             order.worker = request.user
@@ -66,29 +76,42 @@ class OrderActionView(View):
         elif action == 'reject':
             # return the reserved money to the employer if the worker refuses the order.
             order.client.balance += order.amount
-            order.client.save()
-
             order.status = 'rejected'
+            transaction.transaction_type = 'cancellation'
+            transaction.description = 'Отказ от заказа, возврат денег работодателю.'
+
+            transaction.save()
+            order.client.save()
             order.save()
-            messages.error(request, "Вы отказались от заказа.")
+            messages.warning(request, "Вы отказались от заказа.")
 
         elif action == 'complete':
             if request.user != order.client:
-                messages.error(request, "У вас нет прав завершать этот заказ.")
+                messages.warning(request, "У вас нет прав завершать этот заказ.")
                 return redirect('users:profile')
 
             # We calculate the commission and transfer money to the worker
-            commission = order.amount * Decimal('0.05')
+            commission = order.amount * Decimal('0.01')  # Change if we want to earn more money: 0.01 = 1%, etc.
             amount_to_worker = order.amount - commission
 
             order.worker.balance += amount_to_worker
             order.worker.is_free = True
-            order.worker.save()
 
             order.status = 'completed'
+            transaction.transaction_type = 'payment'
 
+            transaction.description = 'Успешная оплата за заказ'
+            transaction.save()
+            order.worker.save()
             order.save()
 
+            Transaction.objects.create(
+                user=order.worker,
+                order=order,
+                amount=amount_to_worker,
+                transaction_type='payment',
+                description='Поздравляем с выполнением заказа.',
+            )
             messages.success(request, "Заказ успешно завершён!")
 
         return redirect('users:profile')
