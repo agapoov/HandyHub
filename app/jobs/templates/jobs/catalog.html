@@ -43,33 +43,36 @@
 
 <div class="row">
     {% for worker in users %}
-    <!-- Карточка работника -->
-    <div class="col-lg-4 col-md-6 p-4">
-        <div class="card border-primary rounded custom-shadow">
-            <img src="{{ worker.image.url }}" class="card-img-top" alt="{{ worker.username }}">
-
-            <div class="card-body">
-                <h5 class="card-title">{{ worker.username }}</h5>
-                <p class="card-text">
-                    {{ worker.surname }} {{ worker.first_name }} {{ worker.last_name }}
-                </p>
-                <p class="card-text">Навыки:
-                    {% for skill in worker.skills.all %}
-                        <span class="badge bg-info">{{ skill.name }}</span>
-                    {% endfor %}
-                </p>
-                <p class="card-text">{{ worker.phone }}</p>
-                <p class="card-text">
-                    Статус:
-                    {% if worker.is_free %}
-                        <span class="text-success">Свободен</span>
-                    {% else %}
-                        <span class="text-danger">Занят</span>
-                    {% endif %}
-                </p>
+        {% if worker.role == 'worker' %}
+                <!-- Карточка работника -->
+            <div class="col-lg-4 col-md-6 p-4">
+                <div class="card border-primary rounded custom-shadow">
+                    <img src="{% if worker.image %}{{  worker.image.url }}{% else %}{% static 'deps/images/default_logo.webp' %}{% endif %}" alt="Аватар пользователя">
+                    <div class="card-body">
+                    <a href="{% url 'users:public_profile' username=worker.username %}">
+                        <h5 class="card-title">{{ worker.username }}</h5>
+                    </a>
+                        <p class="card-text">
+                            {{ worker.surname }} {{ worker.first_name }} {{ worker.last_name }}
+                        </p>
+                        <p class="card-text">Навыки:
+                            {% for skill in worker.skills.all %}
+                                <span class="badge bg-info">{{ skill.name }}</span>
+                            {% endfor %}
+                        </p>
+                        <p class="card-text">{{ worker.phone }}</p>
+                        <p class="card-text">
+                            Статус:
+                            {% if worker.is_free %}
+                                <span class="text-success">Свободен</span>
+                            {% else %}
+                                <span class="text-danger">Занят</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
+        {% endif %}
     {% endfor %}
 </div>
 

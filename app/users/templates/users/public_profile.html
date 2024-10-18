@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-body">
+                <h3>Профиль пользователя: {{ user_profile.username }}</h3>
+                <p><strong>Имя:</strong> {{ user_profile.first_name }} {{ user_profile.last_name }}</p>
+                <p><strong>Email:</strong> **************</p>
+                <p><strong>О себе:</strong> {{ user_profile.about_me|default:"Информация отсутствует" }}</p>
+
+                <h5>Навыки:</h5>
+                    <div class="row skills mb-3">  <!-- Используем row для сетки -->
+                        {% for skill in user_profile.skills.all %}
+                            <div class="col-6 d-flex align-items-center mb-2">  <!-- Каждая колонка занимает 50% -->
+                                <img src="{{ skill.icon.url }}" alt="{{ skill.name }}" style="width: 30px; margin-right: 8px;">
+                                    <span>{{ skill.name }}</span>
+                            </div>
+                         {% endfor %}
+                    </div>
+                {% if user_profile.is_free and request.user.role == 'employer' %}
+                    <a href="{% url 'orders:create_order' username=user_profile.username %}"
+                   class="btn btn-success mt-3">Заказать услугу</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
