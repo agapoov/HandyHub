@@ -32,7 +32,8 @@ class CreateOrderView(View):
 
         # check the users balance
         if request.user.balance < amount:
-            messages.warning(request, 'У вас недостаточно средств для создания заказа.')
+            messages.warning(request,
+                             f'Для создания заказа необходимо {amount} руб., а у вас всего {request.user.balance} руб.')
             return redirect('orders:create_order', username=username)
 
         # Write off funds

@@ -19,9 +19,7 @@ class CatalogView(ListView):
         available = self.request.GET.get('available')
         order_by = self.request.GET.get('order_by')
 
-        if slug_url == 'all':
-            users = User.objects.all()
-        elif query:
+        if query:
             users = q_search(query)
         else:
             users = User.objects.filter(skills__slug=slug_url)

@@ -25,7 +25,7 @@ def login_view(request):
                 messages.success(request, 'Вы успешно вошли в систему.')
                 return redirect('main:index')
             else:
-                messages.error(request, 'Неверное имя пользователя или пароль.')
+                messages.warning(request, 'Неверное имя пользователя или пароль.')
     else:
         form = AuthenticationForm()
 
@@ -38,7 +38,8 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, 'Вы успешно зарегистрировались и вошли в систему.')
+            messages.success(request, 'Вы успешно зарегистрировались и вошли в систему. Теперь укажите свои навыки в '
+                                      'настройках профиля')
             return redirect('main:index')
     else:
         form = CustomUserRegisterForm()

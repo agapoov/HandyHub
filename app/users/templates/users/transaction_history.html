@@ -1,14 +1,44 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load humanize %}
+{% block css %}
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+{% endblock %}
 {% block content %}
     <div class="my-5 pt-5 px-2 pb-2 bg-white custom-shadow rounded">
         {% if transactions %}
             {% for transaction in transactions %}
-                <div class="{% if transaction.transaction_type == 'cancellation' %}text-danger{% elif transaction.transaction_type == 'payment' %}text-success{% endif %}">
-                    <strong>{{ transaction.transaction_type }}</strong>: {{ transaction.amount|intcomma }} руб. - {{ transaction.created_at }}
+                <div class="mb-3 d-flex flex-column">
+                    <div class="d-flex align-items-center">
+                        <!-- Иконка и название типа транзакции -->
+                        {% if transaction.transaction_type == 'cancellation' %}
+                            <i class="fas fa-ban text-danger me-2"></i>
+                        {% elif transaction.transaction_type == 'payment' %}
+                            <i class="fas fa-credit-card text-success me-2"></i>
+                        {% elif transaction.transaction_type == 'reserved' %}
+                            <i class="fas fa-clock text-warning me-2"></i>
+                        {% endif %}
+
+                        <!-- Название типа транзакции -->
+                        <strong class="
+                            {% if transaction.transaction_type == 'cancellation' %}
+                                text-danger
+                            {% elif transaction.transaction_type == 'payment' %}
+                                text-success
+                            {% elif transaction.transaction_type == 'reserved' %}
+                                text-warning
+                            {% endif %}
+                        ">
+                            {{ transaction.get_transaction_type_display }}
+                        </strong>
+                    </div>
+
+                    <!-- Сумма и время транзакции -->
+                    <span>{{ transaction.amount|intcomma }} руб. - {{ transaction.created_at|date:"d.m.Y H:i" }}</span>
+
+                    <!-- Описание транзакции, если есть -->
                     {% if transaction.description %}
-                        <p>{{ transaction.description }}</p>
+                        <p class="mb-0">{{ transaction.description }}</p>
                     {% endif %}
                 </div>
             {% endfor %}
@@ -17,4 +47,3 @@
         {% endif %}
     </div>
 {% endblock %}
-

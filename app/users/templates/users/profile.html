@@ -17,6 +17,9 @@
                                 <div class="col">
                                     <span class="badge bg-dark ms" style="top: 66px; right: 10px;">Баланс: {{ user.balance|intcomma }} руб.</span>
                                 </div>
+                                <div class="col">
+                                    <span class="badge bg-danger ms" style="top: 66px; right: 10px;">Баллы: {{ user.points|intcomma }}</span>
+                                </div>
                             </div>
                         </div>
                     <form action="{% url 'users:profile' %}" method="post" enctype="multipart/form-data">
@@ -209,7 +212,7 @@
                             {% if order.status == 'pending' %}
                                 <p>Статус: Ожидает подтверждения</p>
                             {% elif order.status == 'accepted' %}
-                                <p>Статус: Принято рабочим</p>
+                                <p>Статус: Принято рабочим. Напишите ему в чат, или дождитесь звонка.</p>
                             {% elif order.status == 'rejected' %}
                                 <p>Статус: Отклонено рабочим</p>
                             {% endif %}
@@ -240,9 +243,9 @@
                                 <strong>Работодатель:</strong> {{ order.client.username }}<br>
                                 <strong>Навык:</strong> {{ order.skill.name }}<br>
                                 <strong>Описание:</strong> {{ order.description }}<br>
-                                <strong>Цена:</strong>{{ order.amount|intcomma }} руб. -
+                                <strong>Цена:</strong> {{ order.amount|intcomma }} руб. -
                                 <span class="text-danger">1%</span> = <span class="text-success">
-                                {{ order.amount|floatformat:2|multiply:"0.99"|intcomma }} руб.</span><br>
+                                {{ order.amount|floatformat:2|multiply:"0.99"|intcomma }}0 руб.</span><br>
                                 <strong>Статус:</strong> {{ order.get_status_display }}<br>
 
                                 {% if order.status == 'pending' %}

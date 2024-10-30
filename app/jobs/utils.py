@@ -5,8 +5,6 @@ from users.models import User
 
 
 def q_search(query):
-    if query.isdigit() and len(query) <= 5:
-        return User.objects.filter(id=int(query))
 
     vector = SearchVector('username', 'last_name', 'about_me',)
     query = SearchQuery(query)
