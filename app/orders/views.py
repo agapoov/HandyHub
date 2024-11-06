@@ -23,6 +23,8 @@ class CreateOrderView(View):
         skill_id = request.POST.get('skill')
         description = request.POST.get('description')
         amount = Decimal(request.POST.get('amount'))
+        use_points = request.POST.get('use_points') == 'on'
+        points_used = Decimal(request.POST.get('points_used') or 0)
 
         if not skill_id or not description or not amount:
             messages.warning(request, 'Заполните все поля.')
@@ -30,33 +32,45 @@ class CreateOrderView(View):
 
         skill = get_object_or_404(Skill, id=skill_id)
 
-        # check the users balance
+        # checking availability of points
+        if use_points and points_used > request.user.points:
+            messages.warning(request, 'Недостаточно баллов для списания.')
+            return redirect('orders:create_order', username=username)
+
+        # adjust the order amount taking into account the points
+        if use_points:
+            amount -= points_used
+
+        # checking balance
         if request.user.balance < amount:
             messages.warning(request,
                              f'Для создания заказа необходимо {amount} руб., а у вас всего {request.user.balance} руб.')
             return redirect('orders:create_order', username=username)
 
-        # Write off funds
+        # write-off of funds and points
         request.user.balance -= amount
+        request.user.points -= points_used
         request.user.save()
 
-        # creating order
+        # Создание заказа
         order = Order.objects.create(
             client=request.user,
             worker=worker,
             skill=skill,
             description=description,
-            amount=amount,
+            amount=amount + points_used,
+            points_used=points_used,
             status='pending'
         )
 
         Transaction.objects.create(
             user=request.user,
             order=order,
-            amount=amount,
+            amount=amount + points_used,
             transaction_type='reserved',
             description=f'Резервирование средств для заказа {order.id}',
         )
+
         messages.success(request, 'Заказ успешно создан! Средства зарезервированы.')
         return redirect('users:profile')
 
@@ -76,7 +90,8 @@ class OrderActionView(View):
 
         elif action == 'reject':
             # return the reserved money to the employer if the worker refuses the order.
-            order.client.balance += order.amount
+            order.client.balance += order.amount - order.points_used
+            order.client.points += order.points_used
             order.status = 'rejected'
             transaction.transaction_type = 'cancellation'
             transaction.description = 'Отказ от заказа, возврат денег работодателю.'

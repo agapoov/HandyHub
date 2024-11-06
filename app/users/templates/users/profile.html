@@ -219,7 +219,8 @@
                             {% if order.status == 'accepted' %}
                                 <form method="post" action="{% url 'users:order-action' order.id 'complete' %}">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-info btn-sm">Заказ выполнен</button>
+                                    <button type="submit" class="btn btn-info btn-sm"><i class="bi bi-star"></i>
+                                        Заказ выполнен</button>
                                 </form>
                             {% endif %}
                         </li>
@@ -249,16 +250,18 @@
                                 <strong>Статус:</strong> {{ order.get_status_display }}<br>
 
                                 {% if order.status == 'pending' %}
-                                    <form method="post" action="{% url 'users:order-action' order.id 'accept' %}">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-check-circle me-2"></i>
-                                            Принять</button>
-                                    </form>
-                                    <form method="post" action="{% url 'users:order-action' order.id 'reject' %}" style="display:inline;">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-x-circle me-2"></i>
-                                            Отклонить</button>
-                                    </form>
+                                    <div style="display: flex; gap: 5px;">
+                                        <form method="post" action="{% url 'users:order-action' order.id 'accept' %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-check-circle me-2"></i>
+                                                Принять</button>
+                                        </form>
+                                        <form method="post" action="{% url 'users:order-action' order.id 'reject' %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-x-circle me-2"></i>
+                                                Отклонить</button>
+                                        </form>
+                                    </div>
                                 {% elif order.status == 'accepted' %}
                                     <p>Вы приняли заказ. Вы можете написать работодателю в чате либо позвонить ему по номеру: {{ order.client.phone }}</p>
                                 {% elif order.status == 'rejected' %}

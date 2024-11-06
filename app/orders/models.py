@@ -15,7 +15,9 @@ class Order(models.Model):
                  ('completed', 'Выполнено')],
         default='pending'
     )
-    created_at = models.DateTimeField(auto_now_add=True)
+    use_points = models.BooleanField(default=False)
+    points_used = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
 
     def __str__(self):
         return f'Работодатель: {self.client} | Рабочий: {self.worker} | Навык: {self.skill}'
