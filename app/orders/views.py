@@ -25,34 +25,32 @@ class CreateOrderView(View):
         amount = Decimal(request.POST.get('amount'))
         use_points = request.POST.get('use_points') == 'on'
         points_used = Decimal(request.POST.get('points_used') or 0)
-
+        cash_payment = request.POST.get('cash_payment') == 'on'
         if not skill_id or not description or not amount:
             messages.warning(request, 'Заполните все поля.')
             return redirect('orders:create_order', username=username)
 
         skill = get_object_or_404(Skill, id=skill_id)
 
-        # checking availability of points
         if use_points and points_used > request.user.points:
             messages.warning(request, 'Недостаточно баллов для списания.')
             return redirect('orders:create_order', username=username)
 
-        # adjust the order amount taking into account the points
-        if use_points:
-            amount -= points_used
+        if not cash_payment:
+            if use_points:
+                amount -= points_used
 
-        # checking balance
-        if request.user.balance < amount:
-            messages.warning(request,
-                             f'Для создания заказа необходимо {amount} руб., а у вас всего {request.user.balance} руб.')
-            return redirect('orders:create_order', username=username)
+            if request.user.balance < amount:
+                messages.warning(
+                    request,
+                    f'Для создания заказа необходимо {amount} руб., а у вас всего {request.user.balance} руб.'
+                )
+                return redirect('orders:create_order', username=username)
 
-        # write-off of funds and points
-        request.user.balance -= amount
-        request.user.points -= points_used
-        request.user.save()
+            request.user.balance -= amount
+            request.user.points -= points_used
+            request.user.save()
 
-        # Создание заказа
         order = Order.objects.create(
             client=request.user,
             worker=worker,
@@ -60,18 +58,24 @@ class CreateOrderView(View):
             description=description,
             amount=amount + points_used,
             points_used=points_used,
+            cash_payment=cash_payment,
             status='pending'
         )
 
-        Transaction.objects.create(
-            user=request.user,
-            order=order,
-            amount=amount + points_used,
-            transaction_type='reserved',
-            description=f'Резервирование средств для заказа {order.id}',
-        )
+        if not cash_payment:
+            Transaction.objects.create(
+                user=request.user,
+                order=order,
+                amount=amount + points_used,
+                transaction_type='reserved',
+                description=f'Резервирование средств для заказа {order.id}',
+            )
 
-        messages.success(request, 'Заказ успешно создан! Средства зарезервированы.')
+        if cash_payment:
+            messages.success(request, 'Заказ успешно создан! Оплата наличными при выполнении.')
+        else:
+            messages.success(request, 'Заказ успешно создан! Средства зарезервированы.')
+
         return redirect('users:profile')
 
 

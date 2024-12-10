@@ -27,9 +27,14 @@
                 <label for="amount" class="form-label">Цена в ₽</label>
                 <input type="number" step="0.01" id="amount" name="amount" class="form-control" required>
             </div>
+            <div class="mb-3">
+                <label for="cash_payment" class="form-label"></label>
+                <input type="checkbox" id="cash_payment" name="cash_payment" class="form-check-input">
+                <label class="form-check-label" for="cash_payment">Выбрать оплату наличными</label>
+            </div>
 
             <div class="mb-3">
-                <label for="use_points" class="form-label">Оплатить частично баллами</label>
+                <label for="use_points" class="form-label"></label>
                 <input type="checkbox" id="use_points" name="use_points" class="form-check-input" onclick="togglePointsInput()">
                 <label class="form-check-label" for="use_points">Использовать баллы</label>
             </div>
@@ -46,14 +51,24 @@
 </div>
 
 <script>
-function togglePointsInput() {
-    var pointsSection = document.getElementById('points_section');
-    var checkbox = document.getElementById('use_points');
-    if (checkbox.checked) {
-        pointsSection.style.display = 'block';
-    } else {
-        pointsSection.style.display = 'none';
+    function togglePointsInput() {
+        var pointsSection = document.getElementById('points_section');
+        var usePointsCheckbox = document.getElementById('use_points');
+        var cashPaymentCheckbox = document.getElementById('cash_payment');
+        if (cashPaymentCheckbox.checked) {
+            pointsSection.style.display = 'none';
+            usePointsCheckbox.checked = false;
+            usePointsCheckbox.disabled = true;
+        } else {
+            usePointsCheckbox.disabled = false;
+            if (usePointsCheckbox.checked) {
+                pointsSection.style.display = 'block';
+            } else {
+                pointsSection.style.display = 'none';
+            }
+        }
     }
-}
+    document.getElementById('cash_payment').addEventListener('change', togglePointsInput);
+    document.getElementById('use_points').addEventListener('change', togglePointsInput);
 </script>
 {% endblock %}
