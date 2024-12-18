@@ -36,13 +36,13 @@
    pip install -r requirements.txt
    ```
 8. Выполните миграции:
-  ```bash
-  python manage.py migrate
-  ```
+     ```bash
+     python manage.py migrate
+     ```
 
 9. Запустите проект:
-  ```bash
-  python manage.py runserver
-  ```
+     ```bash
+     python manage.py runserver
+     ```
 
 Проект будет доступен по адресу localhost:8000 или 127.0.0.1:8000
